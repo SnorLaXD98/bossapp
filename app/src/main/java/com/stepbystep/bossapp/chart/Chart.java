@@ -37,9 +37,11 @@ public class Chart extends Fragment {
         tabLayout = (TabLayout) view.findViewById(R.id.tab_layout_sales);
         viewPager2 = (ViewPager2) view.findViewById(R.id.viewPager);
 
+
         FragmentManager manager = getChildFragmentManager();
         ViewPagerAdapter adapter = new ViewPagerAdapter(manager, getLifecycle());
         viewPager2.setAdapter(adapter);
+        viewPager2.setSaveEnabled(false);
 
 //        tabLayout.addTab(tabLayout.newTab().setText("월별 매출"));
 //        tabLayout.addTab(tabLayout.newTab().setText("일별 매출"));

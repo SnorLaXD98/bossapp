@@ -9,6 +9,7 @@ public class StoreAccount implements Serializable {
     private String password; // 패스워드
     private String name; // 이름
     private String phoneNumber;
+    private Truck truck;
 
     public StoreAccount() {
 
@@ -52,5 +53,13 @@ public class StoreAccount implements Serializable {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public Truck getTruck() {
+        return truck;
+    }
+
+    public void setTruck(Truck truck) {
+        this.truck = truck;
     }
 }

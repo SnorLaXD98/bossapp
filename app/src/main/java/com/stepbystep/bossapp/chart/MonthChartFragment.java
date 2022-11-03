@@ -23,6 +23,7 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.firebase.database.FirebaseDatabase;
 import com.stepbystep.bossapp.R;
 
 import java.util.ArrayList;
@@ -36,23 +37,32 @@ public class MonthChartFragment extends Fragment {
 
     private View view;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
       view = inflater.inflate(R.layout.fragment_monthchart, container, false);
 
+      FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+
+
+
+
+
 
       /*    막대그래프   */
       BarChart barChart = (BarChart) view.findViewById(R.id.month_chart);
+      String[] months = {"","","1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"}; // 왜인지 모르겠는데 이렇게 해야 맞음
+      ArrayList<BarEntry> visitors = new ArrayList<>();
+      XAxis xAxis;
+      YAxis yAxis;
 
 
 
-        String[] months = {"","월","1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"}; // 왜인지 모르겠는데 이렇게 해야 맞음
 
-        ArrayList<BarEntry> visitors = new ArrayList<>();
 
-        XAxis xAxis;
-        YAxis yAxis;
+
 
       xAxis = barChart.getXAxis();
       xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -67,12 +77,14 @@ public class MonthChartFragment extends Fragment {
       xAxis.setDrawLabels(true);
       xAxis.setAxisMaximum(14);
       xAxis.setAxisMinimum(1);
-      xAxis.setGranularity(10f);
+      xAxis.setLabelCount(12);
+      
+      xAxis.setGranularity(-1f); // x 축 벨류 간 간격
 
       xAxis.setValueFormatter(new IndexAxisValueFormatter(months));
 
-      xAxis.setTextSize(10f);
-      xAxis.setGranularityEnabled(true);
+      xAxis.setTextSize(8f);
+      xAxis.setGranularityEnabled(false);
 
       yAxis = barChart.getAxisLeft();
       barChart.getAxisRight().setEnabled(false);
@@ -86,25 +98,25 @@ public class MonthChartFragment extends Fragment {
       yAxis.setSpaceMax(0.2f);
       yAxis.setSpaceMin(0.2f);
 
-        visitors.add(new BarEntry(2,100f));
-        visitors.add(new BarEntry(3,200f));
-        visitors.add(new BarEntry(4,300f));
-        visitors.add(new BarEntry(5,200f));
-        visitors.add(new BarEntry(6,600f));
-        visitors.add(new BarEntry(7,100f));
-        visitors.add(new BarEntry(8,200f));
-        visitors.add(new BarEntry(9,300f));
-        visitors.add(new BarEntry(10,200f));
-        visitors.add(new BarEntry(11,600f));
-        visitors.add(new BarEntry(12,100f));
-        visitors.add(new BarEntry(13,200f));
+        visitors.add(new BarEntry(2f,100f)); //1월임 0과 1 인덱스 때문에
+        visitors.add(new BarEntry(3f,200f));
+        visitors.add(new BarEntry(4f,300f));
+        visitors.add(new BarEntry(5f,200f));
+        visitors.add(new BarEntry(6f,600f));
+        visitors.add(new BarEntry(7f,100f));
+        visitors.add(new BarEntry(8f,200f));
+        visitors.add(new BarEntry(9f,300f));
+        visitors.add(new BarEntry(10f,200f));
+        visitors.add(new BarEntry(11f,600f));
+        visitors.add(new BarEntry(12f,100f));
+        visitors.add(new BarEntry(13f,200f));
 
 
 
 
 
-        BarDataSet barDataSet = new BarDataSet(visitors,"단위 : 만원");
-        barDataSet.setFormSize(3f);
+        BarDataSet barDataSet = new BarDataSet(visitors,"매출액");
+        barDataSet.setFormSize(5f);
         barDataSet.setColors(Color.parseColor("#00b2ce"));
         barDataSet.setValueTextColor(Color.BLACK);
         barDataSet.setValueTextSize(0.2f);
@@ -118,12 +130,14 @@ public class MonthChartFragment extends Fragment {
 
         barChart.setFitBars(true);
         barChart.setData(bardata);
-        barChart.getDescription().setText("매출액");
+        barChart.getDescription().setText("단위 : 만원");
         barChart.animateY(1000);
-        barChart.setTouchEnabled(false); // 그래프 확대 못하게 고정
-        barChart.setPinchZoom(false);
-        MyMarkerView mv1 = new MyMarkerView( getContext(),R.layout.custom_marker_view);
+        barChart.setTouchEnabled(true); // 터치는 가능하게 함
+        barChart.setPinchZoom(false);  // 줌 도 못하게 고정
+        barChart.setDoubleTapToZoomEnabled(false); // 더블 탭 확대 못하게 고정
+        MyMarkerView mv1 = new MyMarkerView( getContext(),R.layout.custom_marker_view); // 마커뷰 
         mv1.setChartView(barChart);
+        barChart.setMarker(mv1);
 
 
 
@@ -191,6 +205,12 @@ public class MonthChartFragment extends Fragment {
 //            }
 //        });
 //    }
+
+
+
+
+
+
 
 
 
