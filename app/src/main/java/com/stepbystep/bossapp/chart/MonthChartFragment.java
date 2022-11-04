@@ -23,7 +23,14 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.stepbystep.bossapp.DO.StoreAccount;
 import com.stepbystep.bossapp.R;
 
 import java.util.ArrayList;
@@ -36,14 +43,51 @@ public class MonthChartFragment extends Fragment {
     }
 
     private View view;
-
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
+    FirebaseAuth mAuth;
+    FirebaseUser user;
+    String truck_id;
+    ArrayList<StoreAccount>  storeAccounts = new ArrayList<>();
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
       view = inflater.inflate(R.layout.fragment_monthchart, container, false);
 
-      FirebaseDatabase database = FirebaseDatabase.getInstance();
+      mAuth = FirebaseAuth.getInstance();
+      user = mAuth.getCurrentUser();
+
+
+      firebaseDatabase = FirebaseDatabase.getInstance();
+      databaseReference =  firebaseDatabase.getReference("BossApp").child("StoreAccount");
+      databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+       @Override
+       public void onDataChange(@NonNull DataSnapshot snapshot) {
+               storeAccounts.clear();
+                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                     StoreAccount storeAccount = dataSnapshot.getValue(StoreAccount.class);
+                        System.out.println(storeAccount);
+                        if(storeAccount.getIdToken() != null) {
+                            if (storeAccount.getIdToken().equals(user.getUid())) {
+                                //storeAccounts.add(storeAccount);
+                                truck_id = storeAccount.getTruck().getId();
+                                Calculatesales calculatesales = new Calculatesales();
+                                calculatesales.MonthCalculateSales(truck_id);
+                            }
+                        }
+                 }
+
+           System.out.println(truck_id);
+       }
+
+       @Override
+       public void onCancelled(@NonNull DatabaseError error) {
+
+       }
+     });
+
+
 
 
 
@@ -54,7 +98,7 @@ public class MonthChartFragment extends Fragment {
       /*    막대그래프   */
       BarChart barChart = (BarChart) view.findViewById(R.id.month_chart);
       String[] months = {"","","1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"}; // 왜인지 모르겠는데 이렇게 해야 맞음
-      ArrayList<BarEntry> visitors = new ArrayList<>();
+      ArrayList<BarEntry> sales = new ArrayList<>();
       XAxis xAxis;
       YAxis yAxis;
 
@@ -98,24 +142,24 @@ public class MonthChartFragment extends Fragment {
       yAxis.setSpaceMax(0.2f);
       yAxis.setSpaceMin(0.2f);
 
-        visitors.add(new BarEntry(2f,100f)); //1월임 0과 1 인덱스 때문에
-        visitors.add(new BarEntry(3f,200f));
-        visitors.add(new BarEntry(4f,300f));
-        visitors.add(new BarEntry(5f,200f));
-        visitors.add(new BarEntry(6f,600f));
-        visitors.add(new BarEntry(7f,100f));
-        visitors.add(new BarEntry(8f,200f));
-        visitors.add(new BarEntry(9f,300f));
-        visitors.add(new BarEntry(10f,200f));
-        visitors.add(new BarEntry(11f,600f));
-        visitors.add(new BarEntry(12f,100f));
-        visitors.add(new BarEntry(13f,200f));
+        sales.add(new BarEntry(2f,100f)); //1월임 0과 1 인덱스 때문에
+        sales.add(new BarEntry(3f,200f));
+        sales.add(new BarEntry(4f,300f));
+        sales.add(new BarEntry(5f,200f));
+        sales.add(new BarEntry(6f,600f));
+        sales.add(new BarEntry(7f,100f));
+        sales.add(new BarEntry(8f,200f));
+        sales.add(new BarEntry(9f,300f));
+        sales.add(new BarEntry(10f,200f));
+        sales.add(new BarEntry(11f,600f));
+        sales.add(new BarEntry(12f,100f));
+        sales.add(new BarEntry(13f,200f));
 
 
 
 
 
-        BarDataSet barDataSet = new BarDataSet(visitors,"매출액");
+        BarDataSet barDataSet = new BarDataSet(sales,"매출액");
         barDataSet.setFormSize(5f);
         barDataSet.setColors(Color.parseColor("#00b2ce"));
         barDataSet.setValueTextColor(Color.BLACK);

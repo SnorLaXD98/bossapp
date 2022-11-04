@@ -1,28 +1,40 @@
 package com.stepbystep.bossapp.DO;
 
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Order_history {
+public class Order_history implements Serializable {
 
+    String user_id;
     String truck_name;
     ArrayList<Order> orders;
     String date;
     String image;
     String truck_id;
-    Date ddate;
+    LocalDateTime ddate;
     public Order_history() {
     }
 
-
-    public Order_history(String truck_name, ArrayList<Order> orders, String date, String image, String truck_id, Date ddate) {
+    public Order_history(String user_id, String truck_name, ArrayList<Order> orders, String date, String image, String truck_id, LocalDateTime ddate) {
+        this.user_id = user_id;
         this.truck_name = truck_name;
         this.orders = orders;
         this.date = date;
         this.image = image;
         this.truck_id = truck_id;
         this.ddate = ddate;
+    }
+
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
     public String getTruck_name() {
@@ -65,11 +77,11 @@ public class Order_history {
         this.truck_id = truck_id;
     }
 
-    public Date getDdate() {
+    public LocalDateTime getDdate() {
         return ddate;
     }
 
-    public void setDdate(Date ddate) {
+    public void setDdate(LocalDateTime ddate) {
         this.ddate = ddate;
     }
 

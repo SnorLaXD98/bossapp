@@ -18,6 +18,7 @@ import com.stepbystep.bossapp.chart.StringtoDate;
 
 import java.text.SimpleDateFormat;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -33,12 +34,13 @@ public class ExampleUnitTest {
     @Test
     public void main() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyddMMHHmmss");
-        Date date = StringtoDate.changetodata("2022-08-04 09:48:49");
-        System.out.println(simpleDateFormat.format(date));
+        LocalDateTime date = StringtoDate.changetodata("2022-08-04 09:48:49");
+        System.out.println(date);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
 
-        databaseReference = (DatabaseReference) firebaseDatabase.getReference("FoodTruck").child("Order_history");
+        databaseReference =  firebaseDatabase.getReference("FoodTruck");
+
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

@@ -11,6 +11,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.stepbystep.bossapp.DO.Order_history;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -18,22 +19,24 @@ public class Calculatesales {
 
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
-    private ArrayList<Order_history> order_histories;
-    private Date date;
+    private ArrayList<Order_history> order_histories = new ArrayList<>();
+    private LocalDateTime date;
 
 
 
     public ArrayList<Float> MonthCalculateSales(String truckid){
 
-        databaseReference = (DatabaseReference) firebaseDatabase.getReference("FoodTruck").child("order_history").equalTo(truckid);
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference =  firebaseDatabase.getReference("FoodTruck").child("Order_history");
+        String key = databaseReference.getKey();
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                order_histories.clear();
+
                 for(DataSnapshot snapshot1 : snapshot.getChildren()) {  //반복문으로 리스트를 출력함
                     Order_history order_history = snapshot1.getValue(Order_history.class); // 객체에 데이터를 담는다
                     order_histories.add(order_history);
-                    System.out.println(order_history);
+                    System.out.println("메롱" + order_histories);
                 }
 
             }
@@ -45,12 +48,7 @@ public class Calculatesales {
             }
         });
 
-       for(int i = 0; i < order_histories.size(); i++){
-           String stringdate = order_histories.get(i).getDate();
-           date =  StringtoDate.changetodata(stringdate);
-           order_histories.get(i).setDdate(date);
 
-       }
 
 
 

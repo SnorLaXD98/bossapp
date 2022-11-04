@@ -62,4 +62,16 @@ public class StoreAccount implements Serializable {
     public void setTruck(Truck truck) {
         this.truck = truck;
     }
+
+    @Override
+    public String toString() {
+        return "StoreAccount{" +
+                "idToken='" + idToken + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", name='" + name + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", truck=" + truck +
+                '}';
+    }
 }
