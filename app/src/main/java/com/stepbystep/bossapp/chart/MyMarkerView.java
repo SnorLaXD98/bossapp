@@ -28,9 +28,9 @@ public class MyMarkerView extends MarkerView {
 
         if (e instanceof CandleEntry) {
             CandleEntry ce = (CandleEntry) e;
-            tvContent.setText("" + Utils.formatNumber((int)ce.getHigh(), 0, true) + "만");
+            tvContent.setText(  Utils.formatNumber( ce.getHigh(), 0, true) + "원");
         } else {
-            tvContent.setText("" + Utils.formatNumber((int)e.getY(), 0, true) + "만");
+            tvContent.setText(  Utils.formatNumber( e.getY(), 0, true) + "원");
         }
 
         super.refreshContent(e, highlight);

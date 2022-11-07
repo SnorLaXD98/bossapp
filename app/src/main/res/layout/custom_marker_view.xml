@@ -8,20 +8,20 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="50dp"
+        android:layout_width="70dp"
         android:layout_height="40dp"
         android:gravity="center"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/tvContentHead"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:background="@drawable/background_marker"
             android:layout_centerHorizontal="true"
+            android:background="@drawable/background_marker"
+            android:ellipsize="end"
             android:padding="4dp"
+            android:singleLine="true"
             android:text=""
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/white"
