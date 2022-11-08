@@ -2,9 +2,11 @@ package com.stepbystep.bossapp.chart;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,8 +19,23 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.stepbystep.bossapp.DO.Order;
+import com.stepbystep.bossapp.DO.Order_history;
+import com.stepbystep.bossapp.DO.StoreAccount;
+import com.stepbystep.bossapp.DO.UserAccount;
 import com.stepbystep.bossapp.R;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 public class DayChartFragment extends Fragment {
@@ -27,6 +44,25 @@ public class DayChartFragment extends Fragment {
         DayChartFragment daychart = new DayChartFragment();
         return daychart;
     }
+
+  FirebaseDatabase firebaseDatabase;
+  DatabaseReference storeAccount_databaseReference;
+  FirebaseAuth mAuth;
+  FirebaseUser user;
+  String truck_id;
+  ArrayList<StoreAccount>  storeAccounts;
+  ArrayList<Float> month_sales  ;
+  private DatabaseReference order_history_databaseReference;
+  private DatabaseReference useraccount_databaseReference;
+  private ArrayList<Order_history> order_histories;
+  private ArrayList<Order_history> my_order_histories;
+  private ArrayList<UserAccount> userAccounts;
+  private ArrayList<String> dates;
+  private LocalDate datenow;
+  private ArrayList<Float> sales;
+  private ArrayList<BarEntry> values;
+  private float[] sum;
+
 
 
 
@@ -37,93 +73,172 @@ public class DayChartFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
       view = inflater.inflate(R.layout.fragment_daychart, container, false);
 
-        BarChart barChart = (BarChart) view.findViewById(R.id.day_chart);
-        String[] months = {"","","월","화","수","목","금","토","일"}; // 왜인지 모르겠는데 이렇게 해야 맞음
-        ArrayList<BarEntry> sales = new ArrayList<>();
-        XAxis xAxis;
-        YAxis yAxis;
+      mAuth = FirebaseAuth.getInstance();
+      user = mAuth.getCurrentUser();
+      storeAccounts = new ArrayList<>();
+      month_sales = new ArrayList<>();
+      order_histories = new ArrayList<>();
+      userAccounts = new ArrayList<>();
+      my_order_histories = new ArrayList<>();
+      values = new ArrayList<>();
+      dates = new ArrayList<>();
+      //datenow = LocalDate.now();
+      datenow = LocalDate.of(2022,6,16);
+      sales = new ArrayList<>();
+      sum = new float[7];
 
+      for (int i = 0; i <7 ;i++){
+        sales.add(0f);
+        sum[i]= 0;
+      }
 
-        xAxis = barChart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextSize(10);
-        // 레이블 텍스트 색
-        xAxis.setTextColor(Color.BLACK);
-        // 축 색
-        xAxis.setAxisLineColor(Color.BLACK);
-        // 그래프 뒷 배경의 그리드 표시하지 않기
-        xAxis.setDrawAxisLine(true);
-        xAxis.setDrawGridLines(false);
-        xAxis.setDrawLabels(true);
-        xAxis.setAxisMaximum(9);
-        xAxis.setAxisMinimum(1);
-        xAxis.setLabelCount(7);
-
-        xAxis.setGranularity(-1f); // x 축 벨류 간 간격
-
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(months));
-
-        xAxis.setTextSize(8f);
-        xAxis.setGranularityEnabled(false);
-
-        yAxis = barChart.getAxisLeft();
-        barChart.getAxisRight().setEnabled(false);
-
-        yAxis.setTextColor(Color.BLACK);
-        yAxis.setAxisLineColor(Color.BLACK);
-        yAxis.setDrawAxisLine(false);
-        yAxis.setDrawGridLines(false);
-//        yAxis.setAxisMaximum(1f);
-        yAxis.setAxisMinimum(0f);
-        yAxis.setSpaceMax(0.2f);
-        yAxis.setSpaceMin(0.2f);
-
-        sales.add(new BarEntry(2f,10f)); //1월임 0과 1 인덱스 때문에
-        sales.add(new BarEntry(3f,20f));
-        sales.add(new BarEntry(4f,30f));
-        sales.add(new BarEntry(5f,20f));
-        sales.add(new BarEntry(6f,60f));
-        sales.add(new BarEntry(7f,10f));
-        sales.add(new BarEntry(8f,20f));
+      for (int i = 0; i <9 ;i++){
+        dates.add("");
+        dates.set(i, String.valueOf(datenow.getMonthValue()) + "/" + String.valueOf(datenow.getDayOfMonth()-(8-i)));
+      }
+      dates.set(0,"");
+      dates.set(1,"");
 
 
 
+      firebaseDatabase = FirebaseDatabase.getInstance();
+      storeAccount_databaseReference =  firebaseDatabase.getReference("BossApp").child("StoreAccount");
+      storeAccount_databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+          storeAccounts.clear();
+          for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+            StoreAccount storeAccount = dataSnapshot.getValue(StoreAccount.class);
+            // System.out.println(storeAccount);
+            if(storeAccount.getIdToken() != null) {
+              if (storeAccount.getIdToken().equals(user.getUid())) {
+                //storeAccounts.add(storeAccount);
+                truck_id = storeAccount.getTruck().getId();
 
+                useraccount_databaseReference = firebaseDatabase.getReference("FoodTruck").child("UserAccount");
+                useraccount_databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                  @Override
+                  public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    userAccounts.clear();
+                    order_histories.clear();
+                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                      UserAccount userAccount = snapshot1.getValue(UserAccount.class);
+                      userAccounts.add(userAccount);
+                      // System.out.println(userAccounts);
+                      String user_id = userAccount.getIdToken();
+                      order_history_databaseReference = firebaseDatabase.getReference("FoodTruck").child("Order_history").child(user_id);
+                      order_history_databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                          for (DataSnapshot snapshot1 : snapshot.getChildren()) {  //반복문으로 리스트를 출력함
+                            Order_history order_history = snapshot1.getValue(Order_history.class); // 객체에 데이터를 담는다
+                            order_histories.add(order_history);
 
+                            if (order_history.getTruck_id().equals(truck_id)) {
+                              my_order_histories.add(order_history);
+                              LocalDateTime date = StringtoDate.changetodata(order_history.getDate());
+                              LocalDate order_date = date.toLocalDate();
+                                // 오늘 날짜로 부터 7일 전까지 보여줌
 
+                              int period = (int) ChronoUnit.DAYS.between(order_date,datenow);
 
-        BarDataSet barDataSet = new BarDataSet(sales,"매출액");
-        barDataSet.setFormSize(5f);
-        barDataSet.setColors(Color.parseColor("#00b2ce"));
-        barDataSet.setValueTextColor(Color.BLACK);
-        barDataSet.setValueTextSize(0.2f);
-        barDataSet.setDrawValues(true);
+                              if(period <7){
 
-        // barDataSet.setFormLineWidth(10f);
+                                  switch (period) {
+                                    case 0: {
+                                      ArrayList<Order> orders = order_history.getOrders();
+                                      for (int i = 0; i < orders.size(); i++) {
+                                        sum[6] = sum[6] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                        sales.set(6, sum[6]);
+                                      }
+                                      break;
 
+                                    }
+                                    case 1: {
+                                      ArrayList<Order> orders = order_history.getOrders();
+                                      for (int i = 0; i < orders.size(); i++) {
+                                        sum[5] = sum[5] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                        sales.set(5, sum[5]);
+                                      }
+                                      break;
+                                    }
+                                    case 2: {
+                                      ArrayList<Order> orders = order_history.getOrders();
+                                      for (int i = 0; i < orders.size(); i++) {
+                                        sum[4] = sum[4] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                        sales.set(4, sum[4]);
+                                      }
+                                      break;
+                                    }
+                                    case 3: {
+                                      ArrayList<Order> orders = order_history.getOrders();
+                                      for (int i = 0; i < orders.size(); i++) {
+                                        sum[3] = sum[3] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                        sales.set(3, sum[3]);
+                                      }
+                                      break;
+                                    }
+                                    case 4: {
+                                      ArrayList<Order> orders = order_history.getOrders();
+                                      for (int i = 0; i < orders.size(); i++) {
+                                        sum[2] = sum[2] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                        sales.set(2, sum[2]);
+                                      }
+                                      break;
+                                    }
+                                    case 5: {
+                                      ArrayList<Order> orders = order_history.getOrders();
+                                      for (int i = 0; i < orders.size(); i++) {
+                                        sum[1] = sum[1] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                        sales.set(1, sum[1]);
+                                      }
+                                      break;
+                                    }
+                                    case 6: {
+                                      ArrayList<Order> orders = order_history.getOrders();
+                                      for (int i = 0; i < orders.size(); i++) {
+                                        sum[0] = sum[0] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                        sales.set(0, sum[0]);
+                                      }
+                                      break;
+                                    }
+                                  }
 
-        BarData bardata = new BarData(barDataSet);
-        bardata.setBarWidth(0.3f); // 바의 두께
+                                for(int i = 0; i < sales.size(); i++){
+                                  // System.out.println(sales.get(i));
+                                  values.add(new BarEntry(i+2, sales.get(i).floatValue()));
+                                }
+//                                System.out.println(sales +"\n" +dates);
 
-        barChart.setFitBars(true);
-        barChart.setData(bardata);
-        barChart.getDescription().setText("단위 : 만원");
-        barChart.animateY(1000);
-        barChart.setTouchEnabled(true); // 터치는 가능하게 함
-        barChart.setPinchZoom(false);  // 줌 도 못하게 고정
-        barChart.setDoubleTapToZoomEnabled(false); // 더블 탭 확대 못하게 고정
-        MyMarkerView mv1 = new MyMarkerView( getContext(),R.layout.custom_marker_view); // 마커뷰
-        mv1.setChartView(barChart);
-        barChart.setMarker(mv1);
+                              }
+                            }
+                          }
+                          showchart(values,dates);
+                        }
+                                    @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                          // error
+                          Log.e("Calculatesales", String.valueOf(error.toException()));
+                        }
+                      });
 
+                    }
+                  }
+                  @Override
+                  public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e("Calculatesales", String.valueOf(error.toException()));
+                  }
+                });
+              }
+            }
+          }
 
+        }
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
 
-
-
-
-
-
-
+        }
+      });
 
       return view;
     }
@@ -131,6 +246,92 @@ public class DayChartFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+
+    }
+
+    private void showchart(ArrayList<BarEntry> data,ArrayList<String> date){
+
+      BarChart barChart = (BarChart) view.findViewById(R.id.day_chart);
+
+      String[] weeks =date.toArray(new String[date.size()]); // 왜인지 모르겠는데 이렇게 해야 맞음
+
+      ArrayList<BarEntry> sales = new ArrayList<>();
+      XAxis xAxis;
+      YAxis yAxis;
+
+
+      xAxis = barChart.getXAxis();
+      xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+      xAxis.setTextSize(10);
+      // 레이블 텍스트 색
+      xAxis.setTextColor(Color.BLACK);
+      // 축 색
+      xAxis.setAxisLineColor(Color.BLACK);
+      // 그래프 뒷 배경의 그리드 표시하지 않기
+      xAxis.setDrawAxisLine(false); //
+      xAxis.setDrawGridLines(false);
+      xAxis.setDrawLabels(true);
+      xAxis.setAxisMaximum(9);
+      xAxis.setAxisMinimum(1);
+      xAxis.setLabelCount(7);
+
+      xAxis.setGranularity(-1f); // x 축 벨류 간 간격
+
+      xAxis.setValueFormatter(new IndexAxisValueFormatter(weeks));
+
+      xAxis.setTextSize(8f);
+      xAxis.setGranularityEnabled(false);
+
+      yAxis = barChart.getAxisLeft();
+      barChart.getAxisRight().setEnabled(false);
+
+      yAxis.setTextColor(Color.BLACK);
+      yAxis.setAxisLineColor(Color.BLACK);
+      yAxis.setDrawAxisLine(false);
+      yAxis.setDrawGridLines(false);
+//        yAxis.setAxisMaximum(1f);
+      yAxis.setAxisMinimum(0f);
+      yAxis.setSpaceMax(0.2f);
+      yAxis.setSpaceMin(0.2f);
+
+//      sales.add(new BarEntry(2f,10f));
+//      sales.add(new BarEntry(3f,20f));
+//      sales.add(new BarEntry(4f,30f));
+//      sales.add(new BarEntry(5f,20f));
+//      sales.add(new BarEntry(6f,60f));
+//      sales.add(new BarEntry(7f,10f));
+//      sales.add(new BarEntry(8f,20f));
+
+      for(BarEntry barentry : data){
+        sales.add(barentry);
+      }
+
+
+      BarDataSet barDataSet = new BarDataSet(sales,"매출액");
+      barDataSet.setFormSize(5f);
+      barDataSet.setColors(Color.parseColor("#00b2ce"));
+      barDataSet.setValueTextColor(Color.BLACK);
+      barDataSet.setValueTextSize(0.2f);
+      barDataSet.setDrawValues(true);
+
+      // barDataSet.setFormLineWidth(10f);
+
+
+      BarData bardata = new BarData(barDataSet);
+      bardata.setBarWidth(0.3f); // 바의 두께
+
+      barChart.setFitBars(true);
+      barChart.setData(bardata);
+      barChart.getDescription().setText("단위 : 원");
+      barChart.animateY(2000);
+      barChart.setTouchEnabled(true); // 터치는 가능하게 함
+      barChart.setPinchZoom(false);  // 줌 도 못하게 고정
+      barChart.setDoubleTapToZoomEnabled(false); // 더블 탭 확대 못하게 고정
+      MyMarkerView mv1 = new MyMarkerView( getContext(),R.layout.custom_marker_view); // 마커뷰
+      mv1.setChartView(barChart);
+      barChart.setMarker(mv1);
 
 
 

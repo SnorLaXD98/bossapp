@@ -88,6 +88,7 @@ public class MonthChartFragment extends Fragment {
       sales.add(0f);
       sales.add(0f);
       sales.add(0f);
+      sales.add(0f);
 
 
 
@@ -231,14 +232,14 @@ public class MonthChartFragment extends Fragment {
                                                                 }
                                                             }
                                                         }
-                                                        for(int i = 0; i < sales.size(); i++){
-                                                           // float j = (float) (/(double)10000);
-                                                           //System.out.println(j);
-                                                            values.add(new BarEntry(i+2, sales.get(i).floatValue()));
-                                                        }
-                                                        showChart(values);
-                                                    }
 
+
+                                                    }
+                                                    for(int i = 0; i < sales.size(); i++){
+                                                       // System.out.println(sales.get(i));
+                                                        values.add(new BarEntry(i+2, sales.get(i).floatValue()));
+                                                    }
+                                                    showChart(values);
 
                                                 }
                                                 @Override
@@ -310,7 +311,7 @@ public class MonthChartFragment extends Fragment {
         yAxis.setDrawAxisLine(false);
         yAxis.setDrawGridLines(false);
       //yAxis.setAxisMaximum(100f);
-//      yAxis.setAxisMinimum(0f);
+      yAxis.setAxisMinimum(0f);
         yAxis.setSpaceMax(0.2f);
         yAxis.setSpaceMin(0.2f);
 
@@ -332,7 +333,7 @@ public class MonthChartFragment extends Fragment {
 
         barChart.setFitBars(true);
         barChart.setData(bardata);
-        barChart.getDescription().setText("단위 : 만원");
+        barChart.getDescription().setText("단위 : 원");
         barChart.animateY(2000);
         barChart.setTouchEnabled(true); // 터치는 가능하게 함
         barChart.setPinchZoom(false);  // 줌 도 못하게 고정
