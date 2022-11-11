@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,7 +27,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.stepbystep.bossapp.DO.Order;
 import com.stepbystep.bossapp.DO.Order_history;
 import com.stepbystep.bossapp.DO.StoreAccount;
@@ -35,6 +39,7 @@ import com.stepbystep.bossapp.R;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
@@ -45,13 +50,13 @@ public class DayChartFragment extends Fragment {
         return daychart;
     }
 
-  FirebaseDatabase firebaseDatabase;
-  DatabaseReference storeAccount_databaseReference;
-  FirebaseAuth mAuth;
-  FirebaseUser user;
-  String truck_id;
-  ArrayList<StoreAccount>  storeAccounts;
-  ArrayList<Float> month_sales  ;
+  private FirebaseDatabase firebaseDatabase;
+  private DatabaseReference storeAccount_databaseReference;
+  private FirebaseAuth mAuth;
+  private FirebaseUser user;
+  private String truck_id;
+  private  ArrayList<StoreAccount>  storeAccounts;
+  private  ArrayList<Float> month_sales  ;
   private DatabaseReference order_history_databaseReference;
   private DatabaseReference useraccount_databaseReference;
   private ArrayList<Order_history> order_histories;
@@ -62,6 +67,8 @@ public class DayChartFragment extends Fragment {
   private ArrayList<Float> sales;
   private ArrayList<BarEntry> values;
   private float[] sum;
+  private DatePicker datePicker;
+
 
 
 
@@ -73,6 +80,40 @@ public class DayChartFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
       view = inflater.inflate(R.layout.fragment_daychart, container, false);
 
+
+      datenow = LocalDate.now();
+      datePicker = view.findViewById(R.id.datePicker);
+
+      datePicker.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
+        @Override
+        public void onDateChanged(DatePicker datePicker, int year, int monthofYear, int dayofMonth) {
+
+          datenow = LocalDate.of(year,monthofYear+1,dayofMonth);
+          System.out.println("입력받은 날짜 "+datenow);
+
+          datainChart(datenow);
+
+        }
+
+      });
+
+      datainChart(datenow);
+
+
+      return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+
+
+    }
+
+
+    private void datainChart (LocalDate date){
+
       mAuth = FirebaseAuth.getInstance();
       user = mAuth.getCurrentUser();
       storeAccounts = new ArrayList<>();
@@ -82,10 +123,11 @@ public class DayChartFragment extends Fragment {
       my_order_histories = new ArrayList<>();
       values = new ArrayList<>();
       dates = new ArrayList<>();
-      //datenow = LocalDate.now();
-      datenow = LocalDate.of(2022,6,16);
+
+      //datenow = LocalDate.of(2022,6,16);
       sales = new ArrayList<>();
       sum = new float[7];
+
 
       for (int i = 0; i <7 ;i++){
         sales.add(0f);
@@ -98,8 +140,6 @@ public class DayChartFragment extends Fragment {
       }
       dates.set(0,"");
       dates.set(1,"");
-
-
 
       firebaseDatabase = FirebaseDatabase.getInstance();
       storeAccount_databaseReference =  firebaseDatabase.getReference("BossApp").child("StoreAccount");
@@ -116,6 +156,7 @@ public class DayChartFragment extends Fragment {
                 truck_id = storeAccount.getTruck().getId();
 
                 useraccount_databaseReference = firebaseDatabase.getReference("FoodTruck").child("UserAccount");
+
                 useraccount_databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                   @Override
                   public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -138,89 +179,90 @@ public class DayChartFragment extends Fragment {
                               my_order_histories.add(order_history);
                               LocalDateTime date = StringtoDate.changetodata(order_history.getDate());
                               LocalDate order_date = date.toLocalDate();
-                                // 오늘 날짜로 부터 7일 전까지 보여줌
+                              // 오늘 날짜로 부터 7일 전까지 보여줌
 
-                              int period = (int) ChronoUnit.DAYS.between(order_date,datenow);
+                              int period = (int) ChronoUnit.DAYS.between(order_date, datenow);
 
-                              if(period <7){
+                              if (period < 7) {
 
-                                  switch (period) {
-                                    case 0: {
-                                      ArrayList<Order> orders = order_history.getOrders();
-                                      for (int i = 0; i < orders.size(); i++) {
-                                        sum[6] = sum[6] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                        sales.set(6, sum[6]);
-                                      }
-                                      break;
+                                switch (period) {
+                                  case 0: {
+                                    ArrayList<Order> orders = order_history.getOrders();
+                                    for (int i = 0; i < orders.size(); i++) {
+                                      sum[6] = sum[6] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                      sales.set(6, sum[6]);
+                                    }
+                                    break;
 
-                                    }
-                                    case 1: {
-                                      ArrayList<Order> orders = order_history.getOrders();
-                                      for (int i = 0; i < orders.size(); i++) {
-                                        sum[5] = sum[5] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                        sales.set(5, sum[5]);
-                                      }
-                                      break;
-                                    }
-                                    case 2: {
-                                      ArrayList<Order> orders = order_history.getOrders();
-                                      for (int i = 0; i < orders.size(); i++) {
-                                        sum[4] = sum[4] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                        sales.set(4, sum[4]);
-                                      }
-                                      break;
-                                    }
-                                    case 3: {
-                                      ArrayList<Order> orders = order_history.getOrders();
-                                      for (int i = 0; i < orders.size(); i++) {
-                                        sum[3] = sum[3] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                        sales.set(3, sum[3]);
-                                      }
-                                      break;
-                                    }
-                                    case 4: {
-                                      ArrayList<Order> orders = order_history.getOrders();
-                                      for (int i = 0; i < orders.size(); i++) {
-                                        sum[2] = sum[2] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                        sales.set(2, sum[2]);
-                                      }
-                                      break;
-                                    }
-                                    case 5: {
-                                      ArrayList<Order> orders = order_history.getOrders();
-                                      for (int i = 0; i < orders.size(); i++) {
-                                        sum[1] = sum[1] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                        sales.set(1, sum[1]);
-                                      }
-                                      break;
-                                    }
-                                    case 6: {
-                                      ArrayList<Order> orders = order_history.getOrders();
-                                      for (int i = 0; i < orders.size(); i++) {
-                                        sum[0] = sum[0] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                        sales.set(0, sum[0]);
-                                      }
-                                      break;
-                                    }
                                   }
-
-                                for(int i = 0; i < sales.size(); i++){
-                                  // System.out.println(sales.get(i));
-                                  values.add(new BarEntry(i+2, sales.get(i).floatValue()));
+                                  case 1: {
+                                    ArrayList<Order> orders = order_history.getOrders();
+                                    for (int i = 0; i < orders.size(); i++) {
+                                      sum[5] = sum[5] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                      sales.set(5, sum[5]);
+                                    }
+                                    break;
+                                  }
+                                  case 2: {
+                                    ArrayList<Order> orders = order_history.getOrders();
+                                    for (int i = 0; i < orders.size(); i++) {
+                                      sum[4] = sum[4] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                      sales.set(4, sum[4]);
+                                    }
+                                    break;
+                                  }
+                                  case 3: {
+                                    ArrayList<Order> orders = order_history.getOrders();
+                                    for (int i = 0; i < orders.size(); i++) {
+                                      sum[3] = sum[3] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                      sales.set(3, sum[3]);
+                                    }
+                                    break;
+                                  }
+                                  case 4: {
+                                    ArrayList<Order> orders = order_history.getOrders();
+                                    for (int i = 0; i < orders.size(); i++) {
+                                      sum[2] = sum[2] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                      sales.set(2, sum[2]);
+                                    }
+                                    break;
+                                  }
+                                  case 5: {
+                                    ArrayList<Order> orders = order_history.getOrders();
+                                    for (int i = 0; i < orders.size(); i++) {
+                                      sum[1] = sum[1] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                      sales.set(1, sum[1]);
+                                    }
+                                    break;
+                                  }
+                                  case 6: {
+                                    ArrayList<Order> orders = order_history.getOrders();
+                                    for (int i = 0; i < orders.size(); i++) {
+                                      sum[0] = sum[0] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                      sales.set(0, sum[0]);
+                                    }
+                                    break;
+                                  }
                                 }
-//                                System.out.println(sales +"\n" +dates);
-
                               }
+                              for (int i = 0; i < sales.size(); i++) {
+                                // System.out.println(sales.get(i));
+                                values.add(new BarEntry(i + 2, sales.get(i).floatValue())); // +2는 앞에 빈 값들임 
+                              }
+//                              System.out.println(values);
+//                              System.out.println("확인용"+sales +"\n" +dates);
                             }
                           }
-                          showchart(values,dates);
+                            showchart(values,dates);
                         }
-                                    @Override
+                        @Override
                         public void onCancelled(@NonNull DatabaseError error) {
                           // error
                           Log.e("Calculatesales", String.valueOf(error.toException()));
                         }
                       });
+
+
 
                     }
                   }
@@ -236,20 +278,15 @@ public class DayChartFragment extends Fragment {
         }
         @Override
         public void onCancelled(@NonNull DatabaseError error) {
-
+          Log.e("Calculatesales", String.valueOf(error.toException()));
         }
       });
 
-      return view;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
 
 
 
     }
+
 
     private void showchart(ArrayList<BarEntry> data,ArrayList<String> date){
 
@@ -257,7 +294,7 @@ public class DayChartFragment extends Fragment {
 
       String[] weeks =date.toArray(new String[date.size()]); // 왜인지 모르겠는데 이렇게 해야 맞음
 
-      ArrayList<BarEntry> sales = new ArrayList<>();
+
       XAxis xAxis;
       YAxis yAxis;
 
@@ -296,20 +333,9 @@ public class DayChartFragment extends Fragment {
       yAxis.setSpaceMax(0.2f);
       yAxis.setSpaceMin(0.2f);
 
-//      sales.add(new BarEntry(2f,10f));
-//      sales.add(new BarEntry(3f,20f));
-//      sales.add(new BarEntry(4f,30f));
-//      sales.add(new BarEntry(5f,20f));
-//      sales.add(new BarEntry(6f,60f));
-//      sales.add(new BarEntry(7f,10f));
-//      sales.add(new BarEntry(8f,20f));
-
-      for(BarEntry barentry : data){
-        sales.add(barentry);
-      }
 
 
-      BarDataSet barDataSet = new BarDataSet(sales,"매출액");
+      BarDataSet barDataSet = new BarDataSet(data,"매출액");
       barDataSet.setFormSize(5f);
       barDataSet.setColors(Color.parseColor("#00b2ce"));
       barDataSet.setValueTextColor(Color.BLACK);
@@ -329,11 +355,15 @@ public class DayChartFragment extends Fragment {
       barChart.setTouchEnabled(true); // 터치는 가능하게 함
       barChart.setPinchZoom(false);  // 줌 도 못하게 고정
       barChart.setDoubleTapToZoomEnabled(false); // 더블 탭 확대 못하게 고정
-      MyMarkerView mv1 = new MyMarkerView( getContext(),R.layout.custom_marker_view); // 마커뷰
-      mv1.setChartView(barChart);
-      barChart.setMarker(mv1);
+      setMaker(barChart);
 
 
 
     }
+  private void setMaker(BarChart barChart){
+    MyMarkerView mv1 = new MyMarkerView( getContext(),R.layout.custom_marker_view); // 마커뷰
+    mv1.setChartView(barChart);
+    barChart.setMarker(mv1);
+  }
+
 }

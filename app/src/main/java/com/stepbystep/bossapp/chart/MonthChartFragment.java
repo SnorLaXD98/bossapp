@@ -76,21 +76,10 @@ public class MonthChartFragment extends Fragment {
       dates = new ArrayList<>();
       sales = new ArrayList<>();
       sum = 0;
-      sales.add(0f);
-      sales.add(0f);
-      sales.add(0f);
-      sales.add(0f);
-      sales.add(0f);
-      sales.add(0f);
-      sales.add(0f);
-      sales.add(0f);
-      sales.add(0f);
-      sales.add(0f);
-      sales.add(0f);
-      sales.add(0f);
-      sales.add(0f);
 
-
+      for(int i = 0; i <13;i++){
+          sales.add(0f);
+      }
 
         firebaseDatabase = FirebaseDatabase.getInstance();
       storeAccount_databaseReference =  firebaseDatabase.getReference("BossApp").child("StoreAccount");
@@ -274,8 +263,7 @@ public class MonthChartFragment extends Fragment {
 
         /*    막대그래프   */
         BarChart barChart = (BarChart) view.findViewById(R.id.month_chart);
-        String[] months = {"","","1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"}; // 왜인지 모르겠는데 이렇게 해야 맞음
-        ArrayList<BarEntry> sales = new ArrayList<>();
+        String[] months = {"","","1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"}; //앞에 두개 공백채워줘야함
 
         XAxis xAxis;
         YAxis yAxis;
@@ -315,12 +303,10 @@ public class MonthChartFragment extends Fragment {
         yAxis.setSpaceMax(0.2f);
         yAxis.setSpaceMin(0.2f);
 
-        for(BarEntry barentry : data){
-            sales.add(barentry);
-        }
 
 
-        BarDataSet barDataSet = new BarDataSet(sales,"매출액");
+
+        BarDataSet barDataSet = new BarDataSet(data,"매출액");
         barDataSet.setFormSize(5f);
         barDataSet.setColors(Color.parseColor("#00b2ce"));
         barDataSet.setValueTextColor(Color.BLACK);
