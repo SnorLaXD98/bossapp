@@ -168,19 +168,18 @@ public class DayChartFragment extends Fragment {
                       // System.out.println(userAccounts);
                       String user_id = userAccount.getIdToken();
                       order_history_databaseReference = firebaseDatabase.getReference("FoodTruck").child("Order_history").child(user_id);
-                      order_history_databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                       Query query =  order_history_databaseReference.orderByChild("truck_id").equalTo(truck_id);
+                      query.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                           for (DataSnapshot snapshot1 : snapshot.getChildren()) {  //반복문으로 리스트를 출력함
                             Order_history order_history = snapshot1.getValue(Order_history.class); // 객체에 데이터를 담는다
                             order_histories.add(order_history);
 
-                            if (order_history.getTruck_id().equals(truck_id)) {
                               my_order_histories.add(order_history);
                               LocalDateTime date = StringtoDate.changetodata(order_history.getDate());
                               LocalDate order_date = date.toLocalDate();
                               // 오늘 날짜로 부터 7일 전까지 보여줌
-
                               int period = (int) ChronoUnit.DAYS.between(order_date, datenow);
 
                               if (period < 7) {
@@ -246,12 +245,12 @@ public class DayChartFragment extends Fragment {
                                 }
                               }
                               for (int i = 0; i < sales.size(); i++) {
-                                // System.out.println(sales.get(i));
+                                 System.out.println(sales.get(i));
                                 values.add(new BarEntry(i + 2, sales.get(i).floatValue())); // +2는 앞에 빈 값들임 
                               }
 //                              System.out.println(values);
 //                              System.out.println("확인용"+sales +"\n" +dates);
-                            }
+
                           }
                             showchart(values,dates);
                         }
@@ -356,8 +355,6 @@ public class DayChartFragment extends Fragment {
       barChart.setPinchZoom(false);  // 줌 도 못하게 고정
       barChart.setDoubleTapToZoomEnabled(false); // 더블 탭 확대 못하게 고정
       setMaker(barChart);
-
-
 
     }
   private void setMaker(BarChart barChart){
