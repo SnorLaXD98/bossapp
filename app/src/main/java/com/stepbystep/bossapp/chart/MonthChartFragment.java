@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +20,7 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.utils.Utils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -58,13 +60,15 @@ public class MonthChartFragment extends Fragment {
     private ArrayList<LocalDateTime> dates;
     private ArrayList<Float> sales;
     private ArrayList<BarEntry> values;
-    private float sum;
+    private float[] sum;
+    private int yearsales;
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
       view = inflater.inflate(R.layout.fragment_monthchart, container, false);
+      TextView textView1 = view.findViewById(R.id.textView1);
       mAuth = FirebaseAuth.getInstance();
       user = mAuth.getCurrentUser();
       storeAccounts = new ArrayList<>();
@@ -75,11 +79,14 @@ public class MonthChartFragment extends Fragment {
       values = new ArrayList<>();
       dates = new ArrayList<>();
       sales = new ArrayList<>();
-      sum = 0;
+      sum = new float[13];
 
       for(int i = 0; i <13;i++){
           sales.add(0f);
       }
+        for (int i = 0; i <12 ;i++){
+            sum[i]= 0;
+        }
 
         firebaseDatabase = FirebaseDatabase.getInstance();
       storeAccount_databaseReference =  firebaseDatabase.getReference("BossApp").child("StoreAccount");
@@ -126,96 +133,96 @@ public class MonthChartFragment extends Fragment {
                                                                 case 1: {
                                                                     ArrayList<Order> orders = order_history.getOrders();
                                                                     for (int i = 0; i < orders.size(); i++) {
-                                                                        sum = sum + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
-                                                                        sales.set(0,sum);
+                                                                        sum[0] = sum[0] + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
+                                                                        sales.set(0,sum[0]);
                                                                     } break;
                                                                 }
                                                                 case 2: {
                                                                     ArrayList<Order> orders = order_history.getOrders();
                                                                     for (int i = 0; i < orders.size(); i++) {
-                                                                        sum = sum + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
-                                                                        sales.set(1,sum);
+                                                                        sum[1] = sum[1] + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
+                                                                        sales.set(1,sum[1]);
 
                                                                     } break;
                                                                 }
                                                                 case 3: {
                                                                     ArrayList<Order> orders = order_history.getOrders();
                                                                     for (int i = 0; i < orders.size(); i++) {
-                                                                        sum = sum + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
-                                                                        sales.set(2,sum);
+                                                                        sum[2] = sum[2] + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
+                                                                        sales.set(2,sum[2]);
 
                                                                     } break;
                                                                 }
                                                                 case 4: {
                                                                     ArrayList<Order> orders = order_history.getOrders();
                                                                     for (int i = 0; i < orders.size(); i++) {
-                                                                        sum = sum + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
-                                                                        sales.set(3,sum);
+                                                                        sum[3] = sum[3] + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
+                                                                        sales.set(3,sum[3]);
 
                                                                     } break;
                                                                 }
                                                                 case 5: {
                                                                     ArrayList<Order> orders = order_history.getOrders();
                                                                     for (int i = 0; i < orders.size(); i++) {
-                                                                        sum = sum + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
-                                                                        sales.set(4,sum);
+                                                                        sum[4] = sum[4] + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
+                                                                        sales.set(4,sum[4]);
 
                                                                     }break;
                                                                 }
                                                                 case 6: {
                                                                     ArrayList<Order> orders = order_history.getOrders();
                                                                     for (int i = 0; i < orders.size(); i++) {
-                                                                        sum = sum + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
+                                                                        sum[5] = sum[5] + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
                                                                     }
-                                                                    sales.set(5,sum);
+                                                                    sales.set(5,sum[5]);
                                                                    // System.out.println(sales);
                                                                     break;
                                                                 }
                                                                 case 7: {
                                                                     ArrayList<Order> orders = order_history.getOrders();
                                                                     for (int i = 0; i < orders.size(); i++) {
-                                                                        sum = sum + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
+                                                                        sum[6] = sum[6] + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
                                                                     }
-                                                                    sales.set(6,sum);
+                                                                    sales.set(6,sum[6]);
                                                                     break;
                                                                 }
                                                                 case 8: {
                                                                     ArrayList<Order> orders = order_history.getOrders();
                                                                     for (int i = 0; i < orders.size(); i++) {
-                                                                        sum = sum + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
+                                                                        sum[7] = sum[7] + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
                                                                     }
-                                                                    sales.set(7,sum);
+                                                                    sales.set(7,sum[7]);
                                                                     break;
                                                                 }
                                                                 case 9: {
                                                                     ArrayList<Order> orders = order_history.getOrders();
                                                                     for (int i = 0; i < orders.size(); i++) {
-                                                                        sum = sum + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
+                                                                        sum[8] = sum[8] + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
                                                                     }
-                                                                    sales.set(8,sum);
+                                                                    sales.set(8,sum[8]);
                                                                     break;
                                                                 }
                                                                 case 10: {
                                                                     ArrayList<Order> orders = order_history.getOrders();
                                                                     for (int i = 0; i < orders.size(); i++) {
-                                                                        sum = sum + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
-                                                                        sales.set(9,sum);
+                                                                        sum[9] = sum[9] + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
+                                                                        sales.set(9,sum[9]);
 
                                                                     }break;
                                                                 }
                                                                 case 11: {
                                                                     ArrayList<Order> orders = order_history.getOrders();
                                                                     for (int i = 0; i < orders.size(); i++) {
-                                                                        sum = sum + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
-                                                                        sales.set(10,sum);
+                                                                        sum[10] = sum[10] + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
+                                                                        sales.set(10,sum[10]);
 
                                                                     }break;
                                                                 }
                                                                 case 12: {
                                                                     ArrayList<Order> orders = order_history.getOrders();
                                                                     for (int i = 0; i < orders.size(); i++) {
-                                                                        sum = sum + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
-                                                                        sales.set(11,sum);
+                                                                        sum[11] = sum[11] + (Float.parseFloat(orders.get(i).getFood_cost())*orders.get(i).getFood_number());
+                                                                        sales.set(11,sum[11]);
 
                                                                     }  break;
                                                                 }
@@ -224,12 +231,14 @@ public class MonthChartFragment extends Fragment {
 
 
                                                     }
+                                                    yearsales = 0;
                                                     for(int i = 0; i < sales.size(); i++){
-                                                       // System.out.println(sales.get(i));
+                                                       System.out.println(yearsales);
+                                                        yearsales +=  sales.get(i);
                                                         values.add(new BarEntry(i+2, sales.get(i).floatValue()));
                                                     }
                                                     showChart(values);
-
+                                                    textView1.setText("총 "+ Utils.formatNumber( yearsales, 0, true)  +"원");
                                                 }
                                                 @Override
                                                 public void onCancelled(@NonNull DatabaseError error) {
@@ -323,6 +332,8 @@ public class MonthChartFragment extends Fragment {
         barChart.animateY(2000);
         barChart.setTouchEnabled(true); // 터치는 가능하게 함
         barChart.setPinchZoom(false);  // 줌 도 못하게 고정
+        barChart.setDragEnabled(false);
+        barChart.setScaleEnabled(false);
         barChart.setDoubleTapToZoomEnabled(false); // 더블 탭 확대 못하게 고정
         MyMarkerView mv1 = new MyMarkerView( getContext(),R.layout.custom_marker_view); // 마커뷰
         mv1.setChartView(barChart);

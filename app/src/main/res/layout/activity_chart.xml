@@ -7,23 +7,6 @@
     android:background="@color/white"
     tools:context=".chart.Chart">
 
-<!--    <androidx.appcompat.widget.Toolbar-->
-<!--        android:id="@+id/toolbar"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="70dp"-->
-<!--        android:background="@color/white"-->
-<!--        app:layout_constraintTop_toTopOf="parent">-->
-
-<!--        <ImageButton-->
-<!--            android:id="@+id/btn_back"-->
-<!--            android:layout_width="30dp"-->
-<!--            android:layout_height="30dp"-->
-<!--            android:layout_marginStart="15dp"-->
-<!--            android:layout_marginTop="15dp"-->
-<!--            android:background="@drawable/ic_baseline_arrow_back_24"-->
-<!--            android:backgroundTint="#000000" />-->
-
-<!--    </androidx.appcompat.widget.Toolbar>-->
 
     <!-- 탭레이아웃 -->
     <com.google.android.material.tabs.TabLayout

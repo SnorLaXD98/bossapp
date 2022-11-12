@@ -14,8 +14,6 @@ public class StringtoDate {
 
     public static LocalDateTime changetodata(String stringdate){
 
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
             parse_date = LocalDateTime.parse(stringdate,DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         return  parse_date;

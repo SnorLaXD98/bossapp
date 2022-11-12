@@ -2,6 +2,7 @@ package com.stepbystep.bossapp.chart;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.utils.Utils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -55,20 +57,19 @@ public class DayChartFragment extends Fragment {
   private FirebaseAuth mAuth;
   private FirebaseUser user;
   private String truck_id;
-  private  ArrayList<StoreAccount>  storeAccounts;
-  private  ArrayList<Float> month_sales  ;
+  private ArrayList<StoreAccount>  storeAccounts;
   private DatabaseReference order_history_databaseReference;
   private DatabaseReference useraccount_databaseReference;
   private ArrayList<Order_history> order_histories;
   private ArrayList<Order_history> my_order_histories;
   private ArrayList<UserAccount> userAccounts;
   private ArrayList<String> dates;
-  private LocalDate datenow;
+  private LocalDate datenow= LocalDate.now();
   private ArrayList<Float> sales;
   private ArrayList<BarEntry> values;
+  private int weeksales;
   private float[] sum;
   private DatePicker datePicker;
-
 
 
 
@@ -79,9 +80,6 @@ public class DayChartFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
       view = inflater.inflate(R.layout.fragment_daychart, container, false);
-
-
-      datenow = LocalDate.now();
       datePicker = view.findViewById(R.id.datePicker);
 
       datePicker.setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
@@ -89,12 +87,9 @@ public class DayChartFragment extends Fragment {
         public void onDateChanged(DatePicker datePicker, int year, int monthofYear, int dayofMonth) {
 
           datenow = LocalDate.of(year,monthofYear+1,dayofMonth);
-          System.out.println("입력받은 날짜 "+datenow);
-
-          datainChart(datenow);
-
+         // System.out.println("입력받은 날짜 "+datenow);
+              datainChart(datenow);
         }
-
       });
 
       datainChart(datenow);
@@ -112,17 +107,17 @@ public class DayChartFragment extends Fragment {
     }
 
 
-    private void datainChart (LocalDate date){
+    public void datainChart (LocalDate date){
 
       mAuth = FirebaseAuth.getInstance();
       user = mAuth.getCurrentUser();
       storeAccounts = new ArrayList<>();
-      month_sales = new ArrayList<>();
       order_histories = new ArrayList<>();
       userAccounts = new ArrayList<>();
       my_order_histories = new ArrayList<>();
       values = new ArrayList<>();
       dates = new ArrayList<>();
+
 
       //datenow = LocalDate.of(2022,6,16);
       sales = new ArrayList<>();
@@ -176,83 +171,87 @@ public class DayChartFragment extends Fragment {
                             Order_history order_history = snapshot1.getValue(Order_history.class); // 객체에 데이터를 담는다
                             order_histories.add(order_history);
 
-                              my_order_histories.add(order_history);
-                              LocalDateTime date = StringtoDate.changetodata(order_history.getDate());
-                              LocalDate order_date = date.toLocalDate();
-                              // 오늘 날짜로 부터 7일 전까지 보여줌
-                              int period = (int) ChronoUnit.DAYS.between(order_date, datenow);
+                            my_order_histories.add(order_history);
+                            LocalDateTime date = StringtoDate.changetodata(order_history.getDate());
+                            LocalDate order_date = date.toLocalDate();
+                            // 오늘 날짜로 부터 7일 전까지 보여줌
+                            int period = (int) ChronoUnit.DAYS.between(order_date, datenow);
 
-                              if (period < 7) {
+                            if (period < 7) {
 
-                                switch (period) {
-                                  case 0: {
-                                    ArrayList<Order> orders = order_history.getOrders();
-                                    for (int i = 0; i < orders.size(); i++) {
-                                      sum[6] = sum[6] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                      sales.set(6, sum[6]);
-                                    }
-                                    break;
+                              switch (period) {
+                                case 0: {
+                                  ArrayList<Order> orders = order_history.getOrders();
+                                  for (int i = 0; i < orders.size(); i++) {
+                                    sum[6] = sum[6] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                    sales.set(6, sum[6]);
+                                  }
+                                  break;
 
+                                }
+                                case 1: {
+                                  ArrayList<Order> orders = order_history.getOrders();
+                                  for (int i = 0; i < orders.size(); i++) {
+                                    sum[5] = sum[5] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                    sales.set(5, sum[5]);
                                   }
-                                  case 1: {
-                                    ArrayList<Order> orders = order_history.getOrders();
-                                    for (int i = 0; i < orders.size(); i++) {
-                                      sum[5] = sum[5] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                      sales.set(5, sum[5]);
-                                    }
-                                    break;
+                                  break;
+                                }
+                                case 2: {
+                                  ArrayList<Order> orders = order_history.getOrders();
+                                  for (int i = 0; i < orders.size(); i++) {
+                                    sum[4] = sum[4] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                    sales.set(4, sum[4]);
                                   }
-                                  case 2: {
-                                    ArrayList<Order> orders = order_history.getOrders();
-                                    for (int i = 0; i < orders.size(); i++) {
-                                      sum[4] = sum[4] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                      sales.set(4, sum[4]);
-                                    }
-                                    break;
+                                  break;
+                                }
+                                case 3: {
+                                  ArrayList<Order> orders = order_history.getOrders();
+                                  for (int i = 0; i < orders.size(); i++) {
+                                    sum[3] = sum[3] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                    sales.set(3, sum[3]);
                                   }
-                                  case 3: {
-                                    ArrayList<Order> orders = order_history.getOrders();
-                                    for (int i = 0; i < orders.size(); i++) {
-                                      sum[3] = sum[3] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                      sales.set(3, sum[3]);
-                                    }
-                                    break;
+                                  break;
+                                }
+                                case 4: {
+                                  ArrayList<Order> orders = order_history.getOrders();
+                                  for (int i = 0; i < orders.size(); i++) {
+                                    sum[2] = sum[2] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                    sales.set(2, sum[2]);
                                   }
-                                  case 4: {
-                                    ArrayList<Order> orders = order_history.getOrders();
-                                    for (int i = 0; i < orders.size(); i++) {
-                                      sum[2] = sum[2] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                      sales.set(2, sum[2]);
-                                    }
-                                    break;
+                                  break;
+                                }
+                                case 5: {
+                                  ArrayList<Order> orders = order_history.getOrders();
+                                  for (int i = 0; i < orders.size(); i++) {
+                                    sum[1] = sum[1] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                    sales.set(1, sum[1]);
                                   }
-                                  case 5: {
-                                    ArrayList<Order> orders = order_history.getOrders();
-                                    for (int i = 0; i < orders.size(); i++) {
-                                      sum[1] = sum[1] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                      sales.set(1, sum[1]);
-                                    }
-                                    break;
+                                  break;
+                                }
+                                case 6: {
+                                  ArrayList<Order> orders = order_history.getOrders();
+                                  for (int i = 0; i < orders.size(); i++) {
+                                    sum[0] = sum[0] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                    sales.set(0, sum[0]);
                                   }
-                                  case 6: {
-                                    ArrayList<Order> orders = order_history.getOrders();
-                                    for (int i = 0; i < orders.size(); i++) {
-                                      sum[0] = sum[0] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                      sales.set(0, sum[0]);
-                                    }
-                                    break;
-                                  }
+                                  break;
                                 }
                               }
-                              for (int i = 0; i < sales.size(); i++) {
-                                 System.out.println(sales.get(i));
-                                values.add(new BarEntry(i + 2, sales.get(i).floatValue())); // +2는 앞에 빈 값들임 
-                              }
-//                              System.out.println(values);
+                            }
+                            weeksales = 0;
+                            for (int i = 0; i < sales.size(); i++) {
+                              System.out.println(sales.get(i));
+                              weeksales += sales.get(i);
+                              values.add(new BarEntry(i + 2, sales.get(i).floatValue())); // +2는 앞에 빈 값들임
+                            }
+                            //System.out.println(weeksales);
+                            TextView textView1=  view.findViewById(R.id.textView1);
+                            textView1.setText("총 "+ Utils.formatNumber( weeksales, 0, true)  +"원");
 //                              System.out.println("확인용"+sales +"\n" +dates);
 
                           }
-                            showchart(values,dates);
+                              showchart(values,dates);
                         }
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
@@ -287,7 +286,7 @@ public class DayChartFragment extends Fragment {
     }
 
 
-    private void showchart(ArrayList<BarEntry> data,ArrayList<String> date){
+    private void showchart(ArrayList<BarEntry> data,ArrayList<String> date ){
 
       BarChart barChart = (BarChart) view.findViewById(R.id.day_chart);
 
@@ -351,16 +350,17 @@ public class DayChartFragment extends Fragment {
       barChart.setData(bardata);
       barChart.getDescription().setText("단위 : 원");
       barChart.animateY(2000);
-      barChart.setTouchEnabled(true); // 터치는 가능하게 함
+      barChart.setTouchEnabled(true); // 터치는 가능하게 함\
+      barChart.setDragEnabled(false);
+      barChart.setScaleEnabled(false);
       barChart.setPinchZoom(false);  // 줌 도 못하게 고정
       barChart.setDoubleTapToZoomEnabled(false); // 더블 탭 확대 못하게 고정
-      setMaker(barChart);
 
+      MyMarkerView mv1 = new MyMarkerView(getContext(),R.layout.custom_marker_view); // 마커뷰
+      mv1.setChartView(barChart);
+      barChart.setMarker(mv1);
     }
-  private void setMaker(BarChart barChart){
-    MyMarkerView mv1 = new MyMarkerView( getContext(),R.layout.custom_marker_view); // 마커뷰
-    mv1.setChartView(barChart);
-    barChart.setMarker(mv1);
-  }
 
+  public void onCreateView() {
+  }
 }

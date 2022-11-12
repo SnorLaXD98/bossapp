@@ -16,24 +16,6 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     }
 
 
-
-
-
-    // 상단의 탭 레이아웃 인디케이터 쪽에 텍스트를 선언해주는 곳
-
-//    @Nullable
-//    @Override
-//    public CharSequence getPageTitle(int position) {
-//        switch(position){
-//            case 0:
-//                return "월별 매출";
-//            case 1:
-//                return "일별 매출";
-//            default :
-//                return null;
-//        }
-//    }
-
     @NonNull
     @Override
     public Fragment createFragment(int position) {
