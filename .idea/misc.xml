@@ -9,7 +9,14 @@
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/drawable/background_marker_tail.xml" value="0.1865" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/drawable/button_round_rectangle_background.xml" value="0.205" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/drawable/button_style.xml" value="0.1865" />
+        <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/drawable/menumanage1_custom.xml" value="0.251" />
+        <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/drawable/progressbar_custom.xml" value="0.251" />
+        <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/drawable/recycleview_ripple.xml" value="0.251" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/drawable/round_rectangle_background.xml" value="0.205" />
+        <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/drawable/round_rectangle_background_stroke.xml" value="0.251" />
+        <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/drawable/signup_textbox.xml" value="0.251" />
+        <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/drawable/storemanage_custom.xml" value="0.251" />
+        <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/drawable/tab_icon_color.xml" value="0.251" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/account_cardview_layout.xml" value="0.14629629629629629" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/activity_account_management.xml" value="0.5" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/activity_chart.xml" value="0.17265625" />
@@ -17,6 +24,7 @@
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/activity_festival.xml" value="0.358695652173913" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/activity_festival_content.xml" value="0.358695652173913" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/activity_find_password.xml" value="0.2563405797101449" />
+        <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/activity_foot_traffic.xml" value="0.2078125" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/activity_introductory.xml" value="0.358695652173913" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/activity_login.xml" value="0.36614583333333334" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/activity_main.xml" value="0.22" />
@@ -35,6 +43,7 @@
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/fragment_menu_manage.xml" value="0.358695652173913" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/fragment_monthchart.xml" value="0.25" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/fragment_order.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/fragment_order_list.xml" value="0.27943840579710144" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/fragment_truck_review.xml" value="0.358695652173913" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/item_menu.xml" value="0.358695652173913" />
         <entry key="..\:/Users/82104/Desktop/stepbystep-0fa958fa119b614d46132871cf73549a91e8cd8d/app/src/main/res/layout/notice_recycleview_layout.xml" value="0.358695652173913" />

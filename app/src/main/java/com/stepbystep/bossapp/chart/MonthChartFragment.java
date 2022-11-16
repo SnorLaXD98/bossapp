@@ -233,7 +233,7 @@ public class MonthChartFragment extends Fragment {
                                                     }
                                                     yearsales = 0;
                                                     for(int i = 0; i < sales.size(); i++){
-                                                       System.out.println(yearsales);
+                                                       //System.out.println(yearsales);
                                                         yearsales +=  sales.get(i);
                                                         values.add(new BarEntry(i+2, sales.get(i).floatValue()));
                                                     }

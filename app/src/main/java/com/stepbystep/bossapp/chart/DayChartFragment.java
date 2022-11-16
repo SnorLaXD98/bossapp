@@ -241,7 +241,7 @@ public class DayChartFragment extends Fragment {
                             }
                             weeksales = 0;
                             for (int i = 0; i < sales.size(); i++) {
-                              System.out.println(sales.get(i));
+                              //System.out.println(sales.get(i));
                               weeksales += sales.get(i);
                               values.add(new BarEntry(i + 2, sales.get(i).floatValue())); // +2는 앞에 빈 값들임
                             }

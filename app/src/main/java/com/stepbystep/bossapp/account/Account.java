@@ -80,11 +80,13 @@ public class Account extends Fragment {
         Image image3= new Image(container.getResources().getDrawable(R.drawable.festival_icon), "축제 알림설정");
         Image image4= new Image(container.getResources().getDrawable(R.drawable.notify_icon), "공지사항");
         Image image5= new Image(container.getResources().getDrawable(R.drawable.call_icon), "고객 지원");
+        Image image6= new Image(null,"유동 인구 조회");
         accountAdapter.addItem(image1);
         accountAdapter.addItem(image2);
         accountAdapter.addItem(image3);
         accountAdapter.addItem(image4);
         accountAdapter.addItem(image5);
+        accountAdapter.addItem(image6);
         recyclerView.setAdapter(accountAdapter);
 
         //리스너 설정
@@ -123,6 +125,12 @@ public class Account extends Fragment {
                 else if(position == 4) {
 
                 }
+                //유동인구 조회
+                else if (position == 5 ){
+                    Intent intent = new Intent(rootView.getContext(),FootTrafficActivity.class);
+                    startActivity(intent);
+                }
+
             }
         });
     }
