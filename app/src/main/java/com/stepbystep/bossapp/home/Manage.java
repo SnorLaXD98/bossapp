@@ -339,7 +339,7 @@ public class Manage extends Fragment {
                                         }
                                     }
                                     TextView textView = view.findViewById(R.id.textView1);
-                                    textView.setText(weeksales + "원");
+                                    textView.setText(Utils.formatNumber(weeksales, 0, true) + "원");
                                     showchart(values, dates);
                                 }
 

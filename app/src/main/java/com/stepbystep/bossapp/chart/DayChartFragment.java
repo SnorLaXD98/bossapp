@@ -59,10 +59,8 @@ public class DayChartFragment extends Fragment {
   private String truck_id;
   private ArrayList<StoreAccount>  storeAccounts;
   private DatabaseReference order_history_databaseReference;
-  private DatabaseReference useraccount_databaseReference;
   private ArrayList<Order_history> order_histories;
   private ArrayList<Order_history> my_order_histories;
-  private ArrayList<UserAccount> userAccounts;
   private ArrayList<String> dates;
   private LocalDate datenow= LocalDate.now();
   private ArrayList<Float> sales;
@@ -113,7 +111,6 @@ public class DayChartFragment extends Fragment {
       user = mAuth.getCurrentUser();
       storeAccounts = new ArrayList<>();
       order_histories = new ArrayList<>();
-      userAccounts = new ArrayList<>();
       my_order_histories = new ArrayList<>();
       values = new ArrayList<>();
       dates = new ArrayList<>();
