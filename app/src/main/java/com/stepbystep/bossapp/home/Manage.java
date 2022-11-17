@@ -210,7 +210,7 @@ public class Manage extends Fragment {
     }
 
 
-    public void datainChart (LocalDate date){
+    public void datainChart (LocalDate date) {
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
@@ -227,163 +227,143 @@ public class Manage extends Fragment {
         sum = new float[7];
 
 
-        for (int i = 0; i <7 ;i++){
+        for (int i = 0; i < 7; i++) {
             sales.add(0f);
-            sum[i]= 0;
+            sum[i] = 0;
         }
 
-        for (int i = 0; i <9 ;i++){
+        for (int i = 0; i < 9; i++) {
             dates.add("");
-            dates.set(i, String.valueOf(datenow.getMonthValue()) + "/" + String.valueOf(datenow.getDayOfMonth()-(8-i)));
+            dates.set(i, String.valueOf(datenow.getMonthValue()) + "/" + String.valueOf(datenow.getDayOfMonth() - (8 - i)));
         }
-        dates.set(0,"");
-        dates.set(1,"");
+        dates.set(0, "");
+        dates.set(1, "");
 
         firebaseDatabase = FirebaseDatabase.getInstance();
-        storeAccount_databaseReference =  firebaseDatabase.getReference("BossApp").child("StoreAccount");
+        storeAccount_databaseReference = firebaseDatabase.getReference("BossApp").child("StoreAccount");
         storeAccount_databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 storeAccounts.clear();
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     StoreAccount storeAccount = dataSnapshot.getValue(StoreAccount.class);
                     // System.out.println(storeAccount);
-                    if(storeAccount.getIdToken() != null) {
+                    if (storeAccount.getIdToken() != null) {
                         if (storeAccount.getIdToken().equals(user.getUid())) {
                             //storeAccounts.add(storeAccount);
                             truck_id = storeAccount.getTruck().getId();
 
-                            useraccount_databaseReference = firebaseDatabase.getReference("FoodTruck").child("UserAccount");
+                            order_histories.clear();
 
-                            useraccount_databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            order_history_databaseReference = firebaseDatabase.getReference("FoodTruck").child("OrderHistory");
+                            Query query = order_history_databaseReference.orderByChild("truckId").equalTo(truck_id);
+                            query.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    userAccounts.clear();
-                                    order_histories.clear();
-                                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                                        UserAccount userAccount = snapshot1.getValue(UserAccount.class);
-                                        userAccounts.add(userAccount);
-                                        // System.out.println(userAccounts);
-                                        String user_id = userAccount.getIdToken();
-                                        order_history_databaseReference = firebaseDatabase.getReference("FoodTruck").child("Order_history").child(user_id);
-                                        Query query =  order_history_databaseReference.orderByChild("truck_id").equalTo(truck_id);
-                                        query.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                for (DataSnapshot snapshot1 : snapshot.getChildren()) {  //반복문으로 리스트를 출력함
-                                                    Order_history order_history = snapshot1.getValue(Order_history.class); // 객체에 데이터를 담는다
-                                                    order_histories.add(order_history);
+                                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {  //반복문으로 리스트를 출력함
+                                        Order_history order_history = snapshot1.getValue(Order_history.class); // 객체에 데이터를 담는다
+                                        order_histories.add(order_history);
 
-                                                    my_order_histories.add(order_history);
-                                                    LocalDateTime date = StringtoDate.changetodata(order_history.getDate());
-                                                    LocalDate order_date = date.toLocalDate();
-                                                    // 오늘 날짜로 부터 7일 전까지 보여줌
-                                                    int period = (int) ChronoUnit.DAYS.between(order_date, datenow);
+                                        my_order_histories.add(order_history);
+                                        LocalDateTime date = StringtoDate.changetodata(order_history.getDate());
+                                        LocalDate order_date = date.toLocalDate();
+                                        // 오늘 날짜로 부터 7일 전까지 보여줌
+                                        int period = (int) ChronoUnit.DAYS.between(order_date, datenow);
 
-                                                    if (period < 7) {
+                                        if (period < 7) {
 
-                                                        switch (period) {
-                                                            case 0: {
-                                                                ArrayList<Order> orders = order_history.getOrders();
-                                                                for (int i = 0; i < orders.size(); i++) {
-                                                                    sum[6] = sum[6] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                                                    sales.set(6, sum[6]);
-                                                                }
-                                                                break;
-
-                                                            }
-                                                            case 1: {
-                                                                ArrayList<Order> orders = order_history.getOrders();
-                                                                for (int i = 0; i < orders.size(); i++) {
-                                                                    sum[5] = sum[5] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                                                    sales.set(5, sum[5]);
-                                                                }
-                                                                break;
-                                                            }
-                                                            case 2: {
-                                                                ArrayList<Order> orders = order_history.getOrders();
-                                                                for (int i = 0; i < orders.size(); i++) {
-                                                                    sum[4] = sum[4] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                                                    sales.set(4, sum[4]);
-                                                                }
-                                                                break;
-                                                            }
-                                                            case 3: {
-                                                                ArrayList<Order> orders = order_history.getOrders();
-                                                                for (int i = 0; i < orders.size(); i++) {
-                                                                    sum[3] = sum[3] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                                                    sales.set(3, sum[3]);
-                                                                }
-                                                                break;
-                                                            }
-                                                            case 4: {
-                                                                ArrayList<Order> orders = order_history.getOrders();
-                                                                for (int i = 0; i < orders.size(); i++) {
-                                                                    sum[2] = sum[2] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                                                    sales.set(2, sum[2]);
-                                                                }
-                                                                break;
-                                                            }
-                                                            case 5: {
-                                                                ArrayList<Order> orders = order_history.getOrders();
-                                                                for (int i = 0; i < orders.size(); i++) {
-                                                                    sum[1] = sum[1] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                                                    sales.set(1, sum[1]);
-                                                                }
-                                                                break;
-                                                            }
-                                                            case 6: {
-                                                                ArrayList<Order> orders = order_history.getOrders();
-                                                                for (int i = 0; i < orders.size(); i++) {
-                                                                    sum[0] = sum[0] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
-                                                                    sales.set(0, sum[0]);
-                                                                }
-                                                                break;
-                                                            }
-                                                        }
+                                            switch (period) {
+                                                case 0: {
+                                                    ArrayList<Order> orders = order_history.getOrders();
+                                                    for (int i = 0; i < orders.size(); i++) {
+                                                        sum[6] = sum[6] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                                        sales.set(6, sum[6]);
                                                     }
-                                                    weeksales = 0;
-                                                    for (int i = 0; i < sales.size(); i++) {
-                                                        weeksales += sales.get(i);
-                                                        values.add(new BarEntry(i + 2, sales.get(i).floatValue())); // +2는 앞에 빈 값들임
-                                                    }
+                                                    break;
+
                                                 }
-                                                TextView textView = view.findViewById(R.id.textView1);
-                                                textView.setText(weeksales + "원");
-                                                showchart(values,dates);
+                                                case 1: {
+                                                    ArrayList<Order> orders = order_history.getOrders();
+                                                    for (int i = 0; i < orders.size(); i++) {
+                                                        sum[5] = sum[5] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                                        sales.set(5, sum[5]);
+                                                    }
+                                                    break;
+                                                }
+                                                case 2: {
+                                                    ArrayList<Order> orders = order_history.getOrders();
+                                                    for (int i = 0; i < orders.size(); i++) {
+                                                        sum[4] = sum[4] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                                        sales.set(4, sum[4]);
+                                                    }
+                                                    break;
+                                                }
+                                                case 3: {
+                                                    ArrayList<Order> orders = order_history.getOrders();
+                                                    for (int i = 0; i < orders.size(); i++) {
+                                                        sum[3] = sum[3] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                                        sales.set(3, sum[3]);
+                                                    }
+                                                    break;
+                                                }
+                                                case 4: {
+                                                    ArrayList<Order> orders = order_history.getOrders();
+                                                    for (int i = 0; i < orders.size(); i++) {
+                                                        sum[2] = sum[2] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                                        sales.set(2, sum[2]);
+                                                    }
+                                                    break;
+                                                }
+                                                case 5: {
+                                                    ArrayList<Order> orders = order_history.getOrders();
+                                                    for (int i = 0; i < orders.size(); i++) {
+                                                        sum[1] = sum[1] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                                        sales.set(1, sum[1]);
+                                                    }
+                                                    break;
+                                                }
+                                                case 6: {
+                                                    ArrayList<Order> orders = order_history.getOrders();
+                                                    for (int i = 0; i < orders.size(); i++) {
+                                                        sum[0] = sum[0] + (Float.parseFloat(orders.get(i).getFood_cost()) * orders.get(i).getFood_number());
+                                                        sales.set(0, sum[0]);
+                                                    }
+                                                    break;
+                                                }
                                             }
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
-                                                // error
-                                                Log.e("Calculatesales", String.valueOf(error.toException()));
-                                            }
-                                        });
-
-
-
+                                        }
+                                        weeksales = 0;
+                                        for (int i = 0; i < sales.size(); i++) {
+                                            weeksales += sales.get(i);
+                                            values.add(new BarEntry(i + 2, sales.get(i).floatValue())); // +2는 앞에 빈 값들임
+                                        }
                                     }
+                                    TextView textView = view.findViewById(R.id.textView1);
+                                    textView.setText(weeksales + "원");
+                                    showchart(values, dates);
                                 }
+
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError error) {
+                                    // error
                                     Log.e("Calculatesales", String.valueOf(error.toException()));
                                 }
                             });
+
+
                         }
                     }
                 }
-
             }
+
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e("Calculatesales", String.valueOf(error.toException()));
             }
         });
 
-
-
-
     }
-
     private void setMaker(BarChart barChart){
         MyMarkerView mv1 = new MyMarkerView(this.getContext(),R.layout.custom_marker_view); // 마커뷰
         mv1.setChartView(barChart);

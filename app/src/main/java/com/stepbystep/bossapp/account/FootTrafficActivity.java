@@ -43,15 +43,18 @@ public class FootTrafficActivity extends AppCompatActivity implements OnMapReady
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        LatLng location = new LatLng(37,126);
+        this.googleMap = googleMap;
+        LatLng location = new LatLng(37.321684,127.126761); //단국대
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.title("현재위치");
-        markerOptions.snippet("몰라");
+//        markerOptions.title("장소 이름");
+//        markerOptions.snippet("장소 설명");
         markerOptions.position(location);
         googleMap.addMarker(markerOptions);
 
        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16) ); // 넓게 숫자 크게
         //googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location,16));  // 멀리서부터 가깝게 표시
+
+
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
@@ -82,6 +85,7 @@ public class FootTrafficActivity extends AppCompatActivity implements OnMapReady
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
